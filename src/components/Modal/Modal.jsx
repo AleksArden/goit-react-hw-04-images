@@ -6,24 +6,16 @@ import css from './Modal.module.css';
 
 export const Modal = ({ image: { src, alt }, onClose }) => {
   useEffect(() => {
-    console.log('one fit');
     window.addEventListener('keydown', handleKeydown);
-    return () => {
-      console.log('last fit');
-      window.removeEventListener('keydown', handleKeydown);
-    };
+
+    return () => window.removeEventListener('keydown', handleKeydown);
   }, []);
 
   const handleKeydown = evt => {
-    if (evt.code === 'Escape') {
-      console.log(evt.code);
-      onClose();
-    }
+    if (evt.code === 'Escape') onClose();
   };
   const hanleClickBackdrop = evt => {
-    if (evt.target === evt.currentTarget) {
-      onClose();
-    }
+    if (evt.target === evt.currentTarget) onClose();
   };
 
   return (

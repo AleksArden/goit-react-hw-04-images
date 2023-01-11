@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import Notiflix from 'notiflix';
 import { fetchImages } from 'services/images.services';
@@ -24,14 +23,6 @@ export const App = () => {
   const [status, setStatus] = useState('idle');
   const [currentImage, setCurrentImage] = useState(null);
 
-  // componentDidUpdate(_, prevState) {
-  //   const { search, page, currentImage } = this.state;
-
-  //   if (page > 1 && prevState.currentImage === currentImage) {
-  //     this.onPageScrolling();
-  //   }
-  //
-  // }
   const handleSearch = search => {
     if (search === '') {
       Notiflix.Notify.info('Please, fill in the search field!');
@@ -41,69 +32,58 @@ export const App = () => {
     setPage(1);
   };
 
-  const getImages = async (search = '', page = 1) => {
-    setStatus('loading');
-    try {
-      const data = await fetchImages(search, page);
-      onResolve(data);
-    } catch (error) {
-      console.log(error);
-      setStatus('error');
-    }
-  };
-
   useEffect(() => {
+    const getImages = async (search = '', page = 1) => {
+      setStatus('loading');
+      try {
+        const data = await fetchImages(search, page);
+        onResolve(data);
+      } catch (error) {
+        console.log(error);
+        setStatus('error');
+      }
+    };
+
+    const onResolve = ({ hits, total, totalHits }) => {
+      const newImages = hits.map(
+        ({ id, webformatURL, tags, largeImageURL }) => ({
+          id,
+          webformatURL,
+          tags,
+          largeImageURL,
+        })
+      );
+      if (total === 0) {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        setStatus('idle');
+        return;
+      }
+      if (totalHits < page * 12) {
+        setImages(images => [...images, ...newImages]);
+        setStatus('idle');
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results.",
+          { position: 'center-bottom' }
+        );
+        return;
+      }
+      setImages(images => [...images, ...newImages]);
+      setStatus('success');
+    };
+
     if (search === '') return;
-    console.log('fetch');
     getImages(search, page);
   }, [search, page]);
 
-  const onResolve = ({ hits, total, totalHits }) => {
-    const newImages = hits.map(({ id, webformatURL, tags, largeImageURL }) => ({
-      id,
-      webformatURL,
-      tags,
-      largeImageURL,
-    }));
-    if (total === 0) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      setStatus('idle');
-      return;
-    }
-    if (totalHits < page * 12) {
-      setImages(images => [...images, ...newImages]);
-      setStatus('idle');
-      Notiflix.Notify.failure(
-        "We're sorry, but you've reached the end of search results.",
-        { position: 'center-bottom' }
-      );
-      return;
-    }
-    setImages(images => [...images, ...newImages]);
-    setStatus('success');
-  };
-
-  const handleClickButtonLoadMore = () => {
-    console.log('page + 1');
-    setPage(state => state + 1);
-  };
+  const handleClickButtonLoadMore = () => setPage(state => state + 1);
 
   useEffect(() => {
-    if (page > 1) {
-      console.log('effect-page');
-      onPageScrolling();
-    }
-  }, [page]);
+    if (page > 1) onPageScrolling();
+  }, [images, page]);
 
-  const handleOpenModal = image => {
-    setCurrentImage(image);
-  };
-
-  const handleCloseModal = () => {
-    setCurrentImage(null);
-  };
+  const handleOpenModal = image => setCurrentImage(image);
 
   const onPageScrolling = () => {
     const { height: cardHeight } = document
@@ -133,7 +113,7 @@ export const App = () => {
       )}
       {status === 'loading' && <Loader />}
       {currentImage && (
-        <Modal image={currentImage} onClose={handleCloseModal} />
+        <Modal image={currentImage} onClose={() => setCurrentImage(null)} />
       )}
     </div>
   );

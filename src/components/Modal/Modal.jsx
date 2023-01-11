@@ -1,44 +1,44 @@
-import { Component } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import css from './Modal.module.css';
 
-export class Modal extends Component {
-  static propTypes = {
-    image: PropTypes.shape({
-      src: PropTypes.string.isRequired,
-      alt: PropTypes.string.isRequired,
-    }).isRequired,
-    onClose: PropTypes.func.isRequired,
-  };
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeydown);
-  }
+export const Modal = ({ image: { src, alt }, onClose }) => {
+  useEffect(() => {
+    console.log('one fit');
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      console.log('last fit');
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, []);
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeydown);
-  }
-  handleKeydown = evt => {
+  const handleKeydown = evt => {
     if (evt.code === 'Escape') {
-      this.props.onClose();
+      console.log(evt.code);
+      onClose();
     }
   };
-  hanleClickBackdrop = evt => {
+  const hanleClickBackdrop = evt => {
     if (evt.target === evt.currentTarget) {
-      this.props.onClose();
+      onClose();
     }
   };
-  render() {
-    const {
-      image: { src, alt },
-    } = this.props;
-    return (
-      <div className={css.backdrop} onClick={this.hanleClickBackdrop}>
-        <div className={css.modal}>
-          <img className={css.img} src={src} alt={alt} />
-        </div>
-      </div>
-    );
-  }
-}
 
+  return (
+    <div className={css.backdrop} onClick={hanleClickBackdrop}>
+      <div className={css.modal}>
+        <img className={css.img} src={src} alt={alt} />
+      </div>
+    </div>
+  );
+};
+
+Modal.propTypes = {
+  image: PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
+};

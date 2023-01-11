@@ -4,7 +4,7 @@ const imagesApi = axios.create({
     baseURL: 'https://pixabay.com/',
 });
 
-export const getImages = async (search, page) => {
+export const fetchImages = async (search, page) => {
     const { data } = await imagesApi.get('api/', {
         params: {
             q: search,

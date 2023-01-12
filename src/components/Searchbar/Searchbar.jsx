@@ -7,7 +7,9 @@ import css from './Searchbar.module.css';
 export const Searchbar = ({ onSubmit }) => {
   const [inputValue, setInputValue] = useState('');
 
-  const handleChange = ({ target: { value } }) => setInputValue(value);
+  const handleChange = ({ target: { value } }) => {
+    setInputValue(value);
+  };
 
   const handleSubmit = evt => {
     evt.preventDefault();

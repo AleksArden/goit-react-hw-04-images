@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
@@ -6,14 +5,17 @@ import css from './Modal.module.css';
 
 export const Modal = ({ image: { src, alt }, onClose }) => {
   useEffect(() => {
+    const handleKeydown = evt => {
+      if (evt.code === 'Escape') onClose();
+    };
+
     window.addEventListener('keydown', handleKeydown);
 
-    return () => window.removeEventListener('keydown', handleKeydown);
-  }, []);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, [onClose]);
 
-  const handleKeydown = evt => {
-    if (evt.code === 'Escape') onClose();
-  };
   const hanleClickBackdrop = evt => {
     if (evt.target === evt.currentTarget) onClose();
   };

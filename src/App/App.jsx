@@ -77,13 +77,22 @@ export const App = () => {
     getImages(search, page);
   }, [search, page]);
 
-  const handleClickButtonLoadMore = () => setPage(state => state + 1);
+  const handleClickButtonLoadMore = () => {
+    setPage(state => state + 1);
+  };
 
   useEffect(() => {
     if (page > 1) onPageScrolling();
-  }, [images, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images]);
 
-  const handleOpenModal = image => setCurrentImage(image);
+  const handleOpenModal = image => {
+    setCurrentImage(image);
+  };
+
+  const handleCloseModal = () => {
+    setCurrentImage(null);
+  };
 
   const onPageScrolling = () => {
     const { height: cardHeight } = document
@@ -113,7 +122,7 @@ export const App = () => {
       )}
       {status === 'loading' && <Loader />}
       {currentImage && (
-        <Modal image={currentImage} onClose={() => setCurrentImage(null)} />
+        <Modal image={currentImage} onClose={handleCloseModal} />
       )}
     </div>
   );

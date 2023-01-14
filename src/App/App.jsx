@@ -83,8 +83,7 @@ export const App = () => {
 
   useEffect(() => {
     if (page > 1) onPageScrolling();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images]);
+  }, [images, page]);
 
   const handleOpenModal = image => {
     setCurrentImage(image);
